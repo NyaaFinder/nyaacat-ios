@@ -101,7 +101,12 @@
         [weakSelf.sendParams setObject:RSSI forKey:@"rssi"];
         [weakSelf.sendParams setObject:[NSNumber numberWithLong:[[NSDate date] timeIntervalSince1970]] forKey:@"timestamp"];
         
-
+        
+        // 判断是否需要上传
+        if ([weakSelf judgeIsDASOUGOU:peripheral.name]) {
+            [weakSelf uploadDataToServer:[weakSelf.sendParams copy]];
+        }
+        
         [weakSelf insertTableView:peripheral advertisementData:advertisementData];
     }];
     
@@ -286,11 +291,9 @@
 }
 
 // 上传数据到服务器
--(void) uploadDataToServer {
+-(void) uploadDataToServer:(NSDictionary *)params{
     // 判断数据是否需要上传到服务器
-    [self sortAvaliableDevices];
-    
-    [_AFNetworkManager PUT:@"http://ssh.jj.letme.repair:2398/bluetooth" parameters:_sendParams success:^(AFHTTPRequestOperation *operation, id responseObject) {
+    [_AFNetworkManager PUT:@"http://ssh.jj.letme.repair:2398/bluetooth" parameters:params success:^(AFHTTPRequestOperation *operation, id responseObject) {
         NSLog(@"JSON: %@", responseObject);
     } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
         NSLog(@"Error: %@", error);
@@ -301,16 +304,25 @@
 -(void) sortAvaliableDevices {
     DASOUGOU_DEVICES = [NSMutableArray array];
     for(CBPeripheral *peripheral in peripherals){
-        NSArray *splitRes = [peripheral.name componentsSeparatedByString:@"-"];
-        if ([@"DASOUGOU" isEqualToString:splitRes[0]]) {
+        if([self judgeIsDASOUGOU:peripheral.name]){
             [DASOUGOU_DEVICES addObject:@{
                                           @"identifier":peripheral.identifier.UUIDString,
                                           @"name":peripheral.name
                                           }];
         }
     }
-    
 }
+
+-(BOOL) judgeIsDASOUGOU:(NSString* )device_name{
+    NSArray *splitRes = [device_name componentsSeparatedByString:@"-"];
+    return [@"DASOUGOU" isEqualToString:splitRes[0]];
+}
+
+// 获取可用设备列表
+- (NSArray* ) getAvaliableDevices {
+    return [_sendParams copy];
+}
+
 
 /***==============================END FOOTER==============================***/
 
