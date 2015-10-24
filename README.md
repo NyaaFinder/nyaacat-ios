@@ -1,2 +1,1 @@
-# nyaacat-ios
-Nyaacat iOS client.
+DASOUGOU
