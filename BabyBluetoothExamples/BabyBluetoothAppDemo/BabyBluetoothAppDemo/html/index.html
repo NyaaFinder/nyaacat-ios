@@ -1,0 +1,131 @@
+<html>
+    <head>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+	
+    	<!-- JQuery isn't needed for JockeyJS, just used in this example. --> 
+		<script type="text/javascript" src="jquery-1.9.1.js"></script>
+
+		<!-- Required includes. json2.js may not be required in specific instances. -->
+		<script type="text/javascript" src="jockey.js"></script>
+
+		<script type="text/javascript">
+			$(document).ready(function() {
+			
+				// Tell the iOS app to toggle fullscreen mode.
+
+				$("#getToken").on("click", function() {
+                                  Jockey.send("getToken", {},function(token){
+                                              alert(token);
+                                              });
+				});
+                              $("#setToken").on("click", function() {
+                                                Jockey.send("setToken", {
+                                                            token:"heihei"
+                                                            });
+                                                });
+                              $("#selectPets").on("click", function() {
+                                                Jockey.send("selectPets", {
+                                                            token:"heihei"
+                                                            });
+                                                });
+                              Jockey.on("selectPetsDone",function(data){
+                                        alert(data.name);
+                                        alert(data.id);
+                                        })
+				// Change the color of the backgound based on a color that's
+				// sent from the iOS app.
+				Jockey.on("color-change", function(payload) {
+					$(document.body).css("background", payload.color);
+				});
+				
+				// Add an image to the page using an RSS feed passed in from
+				// the iOS app. Notice we don't call the complete() method until
+				// both the feed and the image have finished loading.
+				Jockey.on("show-image", function(payload, complete) {
+					$.get(payload.feed, function (data) {
+						$("img").remove();
+					
+						var items = $(data).find("item");
+						
+						var index = Math.round(Math.random() * items.length);
+						var description = $(items.get(index)).find("description");
+
+						var offscreen = $(document.createElement("div"));
+						offscreen.addClass("offscreen");
+						offscreen.append(description.text());
+
+						$(document.body).append(offscreen);
+						
+						// Correct the image that comes from the description.
+						// Google leaves off the "http" from the scheme.
+						var brokenImage = $(offscreen.find("img").get(0));
+						var image = $(document.createElement("img"));
+						image.attr("src", "http://" + brokenImage.attr("src"));
+						
+						image.load(function() {
+							// Call complete once the image has finished loading.
+							complete();
+						});
+						
+						offscreen.remove();
+						
+						$(document.body).append(image);
+					});
+
+					return false;
+				});
+				
+			});
+		</script>
+    
+        <style>
+        	body {
+        		background-color: #FFF;
+        	}
+        
+            button {
+                font-size: 20px;
+                margin-top: 5px;
+                margin-bottom: 5px;
+            }
+            
+            button.show {
+            	width: 200px;
+            }
+            
+            button.hide {
+            	width: 80px;
+            }
+            
+            img {
+            	width: 100%;
+            }
+            
+            .gray {
+                color: #777;
+            }
+        </style>
+        
+    </head>
+<body>
+
+    <b>Send message from JS -> App</b>
+    <br><span class="gray">Remember: this is a UIWebView.</span>
+    <br><br>
+    
+    <button id="toggle-fullscreen" class="show">Toggle fullscreen</button>
+    <button id="selectPets" class="slow">选择</button>
+    
+    <br>
+    
+    <button id="setToken">setToken</button>
+    <button id="getToken">getToken</button>
+    <br><br>
+    
+    <b>Send message from App -> JS</b>
+    <br><span class="gray">Tap the color buttons below to change the web view's background color. Or click "Show Image" to display an image in the web view.</span>
+    
+        
+</body>
+</html>
+
