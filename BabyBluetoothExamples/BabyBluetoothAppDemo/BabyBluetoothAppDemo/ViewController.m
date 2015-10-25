@@ -34,6 +34,7 @@
 }
 
 @property (nonatomic) NSMutableDictionary *sendParams;
+@property (nonatomic) NSMutableArray *coordinates;
 
 @end
 
@@ -44,13 +45,7 @@
     
     _AFNetworkManager = [AFHTTPRequestOperationManager manager];
     _sendParams = [[NSMutableDictionary alloc] init];
-    // UI按钮渲染,导航右侧菜单
-    UIButton *navRightBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    [navRightBtn setFrame:CGRectMake(0, 0, 30, 30)];
-    [navRightBtn setTitle:@"😂" forState:UIControlStateNormal];
-    [navRightBtn.titleLabel setTextColor:[UIColor blackColor]];
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]initWithCustomView:navRightBtn];
-    [navRightBtn addTarget:self action:@selector(uploadDataToServer) forControlEvents:UIControlEventTouchUpInside];
+    _coordinates = [NSMutableArray array];
     
     NSLog(@"viewDidLoad");
     [SVProgressHUD showInfoWithStatus:@"准备打开设备"];
@@ -66,8 +61,6 @@
     
     // 开启地理位置信息监听
     [self initializeLocationService];
-    
-    
 }
 -(void)viewDidAppear:(BOOL)animated{
     NSLog(@"viewDidAppear");
@@ -96,14 +89,22 @@
     
     //设置扫描到设备的委托
     [baby setBlockOnDiscoverToPeripherals:^(CBCentralManager *central, CBPeripheral *peripheral, NSDictionary *advertisementData, NSNumber *RSSI) {
-        [weakSelf.sendParams setObject:peripheral.identifier.UUIDString forKey:@"identifier"];
-        [weakSelf.sendParams setObject:peripheral.name forKey:@"name"];
-        [weakSelf.sendParams setObject:RSSI forKey:@"rssi"];
-        [weakSelf.sendParams setObject:[NSNumber numberWithLong:[[NSDate date] timeIntervalSince1970]] forKey:@"timestamp"];
         
-        
-        // 判断是否需要上传
-        if ([weakSelf judgeIsDASOUGOU:peripheral.name]) {
+        [weakSelf sortAvaliableDevices];
+        if ([weakSelf judgeIsAvaliable:peripheral.name]) {
+            NSLog(@"find %@ %@ %@",peripheral.name,[[advertisementData objectForKey:@"kCBAdvDataServiceUUIDs"] objectAtIndex:0],RSSI);
+
+//            NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+//            [weakSelf.sendParams setObject:[userDefaults objectForKey:@"token"] forKey:@"token"];
+            [weakSelf.sendParams setObject:[[advertisementData objectForKey:@"kCBAdvDataServiceUUIDs"] objectAtIndex:0] forKey:@"identifier"];
+            [weakSelf.sendParams setObject:peripheral.name forKey:@"name"];
+            [weakSelf.sendParams setObject:RSSI forKey:@"rssi"];
+            [weakSelf.sendParams setObject:[NSNumber numberWithLong:[[NSDate date] timeIntervalSince1970]] forKey:@"timestamp"];
+            
+            NSDictionary *coorRes = [weakSelf calcFinalCoordinate:[weakSelf.coordinates copy]];
+            [weakSelf.sendParams setObject:[coorRes objectForKey:@"lat"] forKey:@"lat"];
+            [weakSelf.sendParams setObject:[coorRes objectForKey:@"lng"] forKey:@"lng"];
+            
             [weakSelf uploadDataToServer:[weakSelf.sendParams copy]];
         }
         
@@ -148,7 +149,6 @@
     
     //设置查找设备的过滤器
     [baby setFilterOnDiscoverPeripherals:^BOOL(NSString *peripheralName) {
-        
         //设置查找规则是名称大于1 ， the search rule is peripheral.name length > 2
         if (peripheralName.length >2) {
             return YES;
@@ -182,11 +182,41 @@
     NSDictionary *scanForPeripheralsWithOptions = @{CBCentralManagerScanOptionAllowDuplicatesKey:@YES};
     //连接设备->
 //    [baby setBabyOptionsWithScanForPeripheralsWithOptions:scanForPeripheralsWithOptions connectPeripheralWithOptions:nil scanForPeripheralsWithServices:nil discoverWithServices:nil discoverWithCharacteristics:nil];
+    NSTimer *timer;
     
+    timer = [NSTimer scheduledTimerWithTimeInterval: 3
+             
+                                             target: self
+             
+                                           selector: @selector(scan)
+             
+                                           userInfo: nil
+             
+                                            repeats: YES];
+
     
 
 }
-
+-(void)scan
+{
+    [baby cancelScan];
+    baby.scanForPeripherals().begin();
+//    NSLog(@"devices:%@",DASOUGOU_DEVICES);
+//    for(int i=0;i<[DASOUGOU_DEVICES count];i++){
+//        CBPeripheral *p = [DASOUGOU_DEVICES objectAtIndex:i];
+//        [p readRSSI];
+////        NSLog(@"p.RSSI:%@",p.RSSI);
+////        [self.sendParams setObject:p.identifier.UUIDString forKey:@"identifier"];
+////        [self.sendParams setObject:p.name forKey:@"name"];
+////        [self.sendParams setObject:p.RSSI forKey:@"rssi"];
+////        [self.sendParams setObject:[NSNumber numberWithLong:[[NSDate date] timeIntervalSince1970]] forKey:@"timestamp"];
+////        [self uploadDataToServer:[self.sendParams copy]];
+//    }
+}
+- (void)peripheral:(CBPeripheral *)peripheral didReadRSSI:(NSNumber *)RSSI error:(nullable NSError *)error 
+{
+    NSLog(@"peripheralDidUpdateRSSI:%@",RSSI);
+}
 #pragma mark -UIViewController 方法
 //插入table数据
 -(void)insertTableView:(CBPeripheral *)peripheral advertisementData:(NSDictionary *)advertisementData{
@@ -243,23 +273,34 @@
 }
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
-    //停止扫描
+    // 停止扫描
     [baby cancelScan];
     
     [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
-    PeripheralViewContriller *vc = [[PeripheralViewContriller alloc]init];
-    vc.currPeripheral = [peripherals objectAtIndex:indexPath.row];
-    vc->baby = self->baby;
-    [self.navigationController pushViewController:vc animated:YES];
+    CBPeripheral *peripheral =  [peripherals objectAtIndex:indexPath.row];
+
+    [self dismissViewControllerAnimated:NO completion:^{
+        [self.delegate pick:peripheral.identifier.UUIDString name:peripheral.name];
+    }];
+    
+//    PeripheralViewContriller *vc = [[PeripheralViewContriller alloc]init];
+//    vc.currPeripheral = [peripherals objectAtIndex:indexPath.row];
+//    vc->baby = self->baby;
+//    [self.navigationController pushViewController:vc animated:YES];
     
 }
 
 #pragma mark - 获取当前用户坐标
 /***==============================FOOTER==============================***/
 -(void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray<CLLocation *> *)locations {
-    [_sendParams setObject:[NSNumber numberWithFloat:locations[0].coordinate.latitude ] forKey:@"lat"];
-    [_sendParams setObject:[NSNumber numberWithFloat:locations[0].coordinate.longitude] forKey:@"lng"];
-    NSLog(@"I am at lat %f,lng %f",locations[0].coordinate.latitude,locations[0].coordinate.longitude);
+    [_coordinates addObject:@{
+                              @"lng":[NSNumber numberWithLong:locations[0].coordinate.longitude * 1000000],
+                              @"lat":[NSNumber numberWithLong:locations[0].coordinate.latitude * 1000000]
+                              }];
+    
+    if ([_coordinates count] > 30) {
+        [_coordinates removeObjectAtIndex:0];
+    }
 }
 
 - (void)initializeLocationService {
@@ -291,38 +332,78 @@
 }
 
 // 上传数据到服务器
--(void) uploadDataToServer:(NSDictionary *)params{
+-(void) uploadDataToServer:(NSDictionary *) params{
     // 判断数据是否需要上传到服务器
-    [_AFNetworkManager PUT:@"http://ssh.jj.letme.repair:2398/bluetooth" parameters:params success:^(AFHTTPRequestOperation *operation, id responseObject) {
-        NSLog(@"JSON: %@", responseObject);
-    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
-        NSLog(@"Error: %@", error);
-    }];
+    // [self sortAvaliableDevices];
+    NSLog(@"当前样本数目：%lu,%@",(unsigned long)[_coordinates count],params);
+    if([_coordinates count] > 20){
+        [_AFNetworkManager PUT:@"http://ssh.jj.letme.repair:2398/bluetooth" parameters:params success:^(AFHTTPRequestOperation *operation, id responseObject) {
+            NSLog(@"================== JSON: %@", @"success");
+        } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+            NSLog(@"================== Error: %@", @"error");
+        }];
+    }
 }
 
 // 过滤出可用设备列表
 -(void) sortAvaliableDevices {
     DASOUGOU_DEVICES = [NSMutableArray array];
     for(CBPeripheral *peripheral in peripherals){
-        if([self judgeIsDASOUGOU:peripheral.name]){
-            [DASOUGOU_DEVICES addObject:@{
-                                          @"identifier":peripheral.identifier.UUIDString,
-                                          @"name":peripheral.name
-                                          }];
+        NSArray *splitRes = [peripheral.name componentsSeparatedByString:@"-"];
+        if ([@"DASOUGOU" isEqualToString:splitRes[0]]) {
+            [DASOUGOU_DEVICES addObject:peripheral];
         }
     }
+    
 }
 
--(BOOL) judgeIsDASOUGOU:(NSString* )device_name{
-    NSArray *splitRes = [device_name componentsSeparatedByString:@"-"];
+- (BOOL) judgeIsAvaliable:(NSString *)name{
+    NSArray *splitRes = [name componentsSeparatedByString:@"-"];
     return [@"DASOUGOU" isEqualToString:splitRes[0]];
 }
 
-// 获取可用设备列表
-- (NSArray* ) getAvaliableDevices {
-    return [_sendParams copy];
+-(IBAction)close:(id)sender
+{
+    
+    [self dismissViewControllerAnimated:YES completion:^{
+        
+    }];
+}
+-(void)pick
+{
+    
 }
 
+
+-(NSDictionary *) calcFinalCoordinate:(NSMutableArray *)intersections{
+    NSMutableDictionary *map = [[NSMutableDictionary alloc] init];
+    NSArray *new_intersections = [[NSArray alloc] initWithArray:intersections copyItems:YES];
+    
+    for (NSDictionary *val in new_intersections) {
+        NSString *str = [NSString stringWithFormat:@"%@,%@",[val objectForKey:@"lng"],[val objectForKey:@"lat"]];
+
+        if([map valueForKey:str]==nil){
+            [map setValue:@1 forKey:str];
+        }else{
+            [map setValue:[NSNumber numberWithInt:[(NSNumber *)[map objectForKey:str] intValue]+1] forKey:str];
+        }
+    }
+    NSString *str = @"";
+    for(NSString *key in map ){
+        if([str isEqualToString:@""]){
+            str = key;
+            continue;
+        }
+        if([(NSNumber *)map[key] intValue]>[(NSNumber *)map[str] intValue]){
+            str = key;
+        }
+    }
+    NSArray *firstSplit = [str componentsSeparatedByString:@","];
+    return @{
+             @"lng":[NSNumber numberWithFloat:([[firstSplit objectAtIndex:0] intValue]-0.5f)/1000000],
+             @"lat":[NSNumber numberWithFloat:([[firstSplit objectAtIndex:1] intValue]-0.5f)/1000000]
+             };
+}
 
 /***==============================END FOOTER==============================***/
 

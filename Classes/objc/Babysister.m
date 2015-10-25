@@ -373,7 +373,10 @@
 //    NSLog(@">>>didWriteValueForCharacteristic");
 //    NSLog(@">>>uuid:%@,new value:%@",descriptor.UUID,descriptor.value);
 }
-
+- (void)peripheral:(CBPeripheral *)peripheral didReadRSSI:(NSNumber *)RSSI error:(nullable NSError *)error
+{
+    NSLog(@"peripheralDidUpdateRSSI:%@",RSSI);
+}
 #pragma mark -私有方法
 
 #pragma mark -设备list管理

@@ -7,6 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B4C2CFAD1BDBACF600D4FF60 /* JockeyViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B4C2CFAC1BDBACF600D4FF60 /* JockeyViewController.m */; };
+		B4C2CFB11BDBAD0D00D4FF60 /* Jockey.m in Sources */ = {isa = PBXBuildFile; fileRef = B4C2CFB01BDBAD0D00D4FF60 /* Jockey.m */; };
+		B4C2CFB31BDBADB200D4FF60 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B4C2CFB21BDBADB200D4FF60 /* WebKit.framework */; };
+		B4C2CFB71BDBAEB700D4FF60 /* index.html in Resources */ = {isa = PBXBuildFile; fileRef = B4C2CFB51BDBAEB700D4FF60 /* index.html */; };
+		B4C2CFB81BDBAEB700D4FF60 /* main.js in Resources */ = {isa = PBXBuildFile; fileRef = B4C2CFB61BDBAEB700D4FF60 /* main.js */; };
+		B4C2CFBC1BDBAEC600D4FF60 /* jockey.js in Resources */ = {isa = PBXBuildFile; fileRef = B4C2CFBA1BDBAEC600D4FF60 /* jockey.js */; };
+		B4C2CFBD1BDBAEC600D4FF60 /* jquery-1.9.1.js in Resources */ = {isa = PBXBuildFile; fileRef = B4C2CFBB1BDBAEC600D4FF60 /* jquery-1.9.1.js */; };
 		B4F336901BDB7D0900E2BC25 /* AFHTTPRequestOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = B4F3367E1BDB7D0900E2BC25 /* AFHTTPRequestOperation.m */; };
 		B4F336911BDB7D0900E2BC25 /* AFHTTPRequestOperationManager.m in Sources */ = {isa = PBXBuildFile; fileRef = B4F336801BDB7D0900E2BC25 /* AFHTTPRequestOperationManager.m */; };
 		B4F336921BDB7D0900E2BC25 /* AFHTTPSessionManager.m in Sources */ = {isa = PBXBuildFile; fileRef = B4F336821BDB7D0900E2BC25 /* AFHTTPSessionManager.m */; };
@@ -38,6 +45,16 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		B4C2CFAB1BDBACF600D4FF60 /* JockeyViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JockeyViewController.h; sourceTree = "<group>"; };
+		B4C2CFAC1BDBACF600D4FF60 /* JockeyViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JockeyViewController.m; sourceTree = "<group>"; };
+		B4C2CFAF1BDBAD0D00D4FF60 /* Jockey.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Jockey.h; sourceTree = "<group>"; };
+		B4C2CFB01BDBAD0D00D4FF60 /* Jockey.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Jockey.m; sourceTree = "<group>"; };
+		B4C2CFB21BDBADB200D4FF60 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
+		B4C2CFB51BDBAEB700D4FF60 /* index.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = index.html; sourceTree = "<group>"; };
+		B4C2CFB61BDBAEB700D4FF60 /* main.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = main.js; sourceTree = "<group>"; };
+		B4C2CFBA1BDBAEC600D4FF60 /* jockey.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = jockey.js; sourceTree = "<group>"; };
+		B4C2CFBB1BDBAEC600D4FF60 /* jquery-1.9.1.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "jquery-1.9.1.js"; sourceTree = "<group>"; };
+		B4C2CFBE1BDBB6B900D4FF60 /* SelectPetDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SelectPetDelegate.h; sourceTree = "<group>"; };
 		B4F3367D1BDB7D0900E2BC25 /* AFHTTPRequestOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AFHTTPRequestOperation.h; sourceTree = "<group>"; };
 		B4F3367E1BDB7D0900E2BC25 /* AFHTTPRequestOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AFHTTPRequestOperation.m; sourceTree = "<group>"; };
 		B4F3367F1BDB7D0900E2BC25 /* AFHTTPRequestOperationManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AFHTTPRequestOperationManager.h; sourceTree = "<group>"; };
@@ -99,12 +116,40 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B4C2CFB31BDBADB200D4FF60 /* WebKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		B4C2CFAE1BDBAD0D00D4FF60 /* includes */ = {
+			isa = PBXGroup;
+			children = (
+				B4C2CFAF1BDBAD0D00D4FF60 /* Jockey.h */,
+				B4C2CFB01BDBAD0D00D4FF60 /* Jockey.m */,
+			);
+			path = includes;
+			sourceTree = "<group>";
+		};
+		B4C2CFB41BDBAEB700D4FF60 /* html */ = {
+			isa = PBXGroup;
+			children = (
+				B4C2CFB51BDBAEB700D4FF60 /* index.html */,
+				B4C2CFB61BDBAEB700D4FF60 /* main.js */,
+			);
+			path = html;
+			sourceTree = "<group>";
+		};
+		B4C2CFB91BDBAEC600D4FF60 /* js */ = {
+			isa = PBXGroup;
+			children = (
+				B4C2CFBA1BDBAEC600D4FF60 /* jockey.js */,
+				B4C2CFBB1BDBAEC600D4FF60 /* jquery-1.9.1.js */,
+			);
+			path = js;
+			sourceTree = "<group>";
+		};
 		B4F3367C1BDB7D0900E2BC25 /* AFNetworking */ = {
 			isa = PBXGroup;
 			children = (
@@ -134,6 +179,7 @@
 		E1807E641B6CA29100E99C63 = {
 			isa = PBXGroup;
 			children = (
+				B4C2CFB21BDBADB200D4FF60 /* WebKit.framework */,
 				E1807EA91B6CA53A00E99C63 /* Framework */,
 				E1807E6F1B6CA29100E99C63 /* BabyBluetoothDemo */,
 				E1807E6E1B6CA29100E99C63 /* Products */,
@@ -151,11 +197,16 @@
 		E1807E6F1B6CA29100E99C63 /* BabyBluetoothDemo */ = {
 			isa = PBXGroup;
 			children = (
+				B4C2CFB41BDBAEB700D4FF60 /* html */,
 				F05F7BA31B7339E90051C68A /* Model */,
 				E1807E741B6CA29100E99C63 /* AppDelegate.h */,
 				E1807E751B6CA29100E99C63 /* AppDelegate.m */,
 				E1807E771B6CA29100E99C63 /* ViewController.h */,
 				E1807E781B6CA29100E99C63 /* ViewController.m */,
+				B4C2CFB91BDBAEC600D4FF60 /* js */,
+				B4C2CFAE1BDBAD0D00D4FF60 /* includes */,
+				B4C2CFAB1BDBACF600D4FF60 /* JockeyViewController.h */,
+				B4C2CFAC1BDBACF600D4FF60 /* JockeyViewController.m */,
 				F05F7BA01B70AB0F0051C68A /* PeripheralViewContriller.h */,
 				F05F7BA11B70AB0F0051C68A /* PeripheralViewContriller.m */,
 				F05F7BB01B7442B50051C68A /* CharacteristicViewController.h */,
@@ -164,6 +215,7 @@
 				E1807E7D1B6CA29100E99C63 /* Images.xcassets */,
 				E1807E7F1B6CA29100E99C63 /* LaunchScreen.xib */,
 				E1807E701B6CA29100E99C63 /* Supporting Files */,
+				B4C2CFBE1BDBB6B900D4FF60 /* SelectPetDelegate.h */,
 			);
 			name = BabyBluetoothDemo;
 			path = BabyBluetoothAppDemo;
@@ -294,9 +346,13 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B4C2CFB71BDBAEB700D4FF60 /* index.html in Resources */,
+				B4C2CFBC1BDBAEC600D4FF60 /* jockey.js in Resources */,
 				E1807E7C1B6CA29100E99C63 /* Main.storyboard in Resources */,
 				E1807E811B6CA29100E99C63 /* LaunchScreen.xib in Resources */,
+				B4C2CFB81BDBAEB700D4FF60 /* main.js in Resources */,
 				E1807E7E1B6CA29100E99C63 /* Images.xcassets in Resources */,
+				B4C2CFBD1BDBAEC600D4FF60 /* jquery-1.9.1.js in Resources */,
 				F05F7BAE1B7372300051C68A /* SVProgressHUD.bundle in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -323,12 +379,14 @@
 				E1807E761B6CA29100E99C63 /* AppDelegate.m in Sources */,
 				E1807E731B6CA29100E99C63 /* main.m in Sources */,
 				F05F7BB21B7442B50051C68A /* CharacteristicViewController.m in Sources */,
+				B4C2CFAD1BDBACF600D4FF60 /* JockeyViewController.m in Sources */,
 				E13AD4D51BB78EF900D61C84 /* BabyOptions.m in Sources */,
 				E1DEF5181B98857B0005C9F2 /* BabySpeaker.m in Sources */,
 				E1DEF5161B98857B0005C9F2 /* BabyCallback.m in Sources */,
 				F0644E511BA7B1C600AA0F9F /* BabyRhythm.m in Sources */,
 				B4F336941BDB7D0900E2BC25 /* AFSecurityPolicy.m in Sources */,
 				E1DEF5191B98857B0005C9F2 /* BabyToy.m in Sources */,
+				B4C2CFB11BDBAD0D00D4FF60 /* Jockey.m in Sources */,
 				B4F336911BDB7D0900E2BC25 /* AFHTTPRequestOperationManager.m in Sources */,
 				F05F7BAD1B7372300051C68A /* SVIndefiniteAnimatedView.m in Sources */,
 				B4F336971BDB7D0900E2BC25 /* AFURLResponseSerialization.m in Sources */,
